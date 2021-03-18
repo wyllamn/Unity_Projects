@@ -48,8 +48,8 @@ public class CloudHandler : MonoBehaviour
             tracker.GetTargetFinder<ImageTargetFinder>().EnableTracking(targetSearchResult, newImageTarget);
             //tracker.GetTargetFinder<ImageTargetFinder>().EnableTracking(targetSearchResult, ImageTargetTemplate.gameObject);
             GameObject MainPlayer = newImageTarget.gameObject.transform.Find("Player").gameObject;
-            MainPlayer.GetComponent<VideoPlayer>().url = mTargetMetadata.Trim();
-            //Destroy(ImageTargetTemplate.gameObject.transform.Find("Player").gameObject);
+            MainPlayer.GetComponent<VideoPlayer>().url = mTargetMetadata.Trim(); 
+            MainPlayer.GetComponent<VideoPlayer>().Play();            
         }
 
 

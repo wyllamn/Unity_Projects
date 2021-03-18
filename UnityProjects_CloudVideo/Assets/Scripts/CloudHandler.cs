@@ -8,8 +8,7 @@ public class CloudHandler : MonoBehaviour
     private CloudRecoBehaviour mCloudRecoBehaviour;
     private bool mIsScanning = false;
     private string mTargetMetadata = "";
-    public GameObject MainPlayer;
-
+    //public GameObject MainPlayer;
     public ImageTargetBehaviour ImageTargetTemplate;
 
     public void OnInitError(TargetFinder.InitState initError)
@@ -23,26 +22,45 @@ public class CloudHandler : MonoBehaviour
     }
 
     public void OnNewSearchResult(TargetFinder.TargetSearchResult targetSearchResult)
-    {
+    {     
+
+        GameObject newImageTarget = Instantiate(ImageTargetTemplate.gameObject) as GameObject;
+        GameObject augmentation = null;
+
+        if (augmentation != null)
+        {
+          augmentation.transform.parent = newImageTarget.transform;            
+        }
+
+        
+        Debug.Log("Player encontrado");
         TargetFinder.CloudRecoSearchResult cloudRecoSearchResult =
         (TargetFinder.CloudRecoSearchResult)targetSearchResult;
         // do something with the target metadata
         mTargetMetadata = cloudRecoSearchResult.MetaData;
         Debug.Log("URL: " + mTargetMetadata);
 
-        // Build augmentation based on target 
+        // Build augmentation based on target         
         if (ImageTargetTemplate)
         {
             // enable the new result with the same ImageTargetBehaviour: 
             ObjectTracker tracker = TrackerManager.Instance.GetTracker<ObjectTracker>();
-            tracker.GetTargetFinder<ImageTargetFinder>().EnableTracking(targetSearchResult, ImageTargetTemplate.gameObject);
-
+            tracker.GetTargetFinder<ImageTargetFinder>().EnableTracking(targetSearchResult, newImageTarget);
+            //tracker.GetTargetFinder<ImageTargetFinder>().EnableTracking(targetSearchResult, ImageTargetTemplate.gameObject);
+            GameObject MainPlayer = newImageTarget.gameObject.transform.Find("Player").gameObject;
             MainPlayer.GetComponent<VideoPlayer>().url = mTargetMetadata.Trim();
-            MainPlayer.GetComponent<VideoPlayer>().Play();
+            //Destroy(ImageTargetTemplate.gameObject.transform.Find("Player").gameObject);
         }
 
-        // stop the target finder (i.e. stop scanning the cloud)
-        mCloudRecoBehaviour.CloudRecoEnabled = false;
+
+
+        if (!mIsScanning)
+        {
+            // stop the target finder
+            mCloudRecoBehaviour.CloudRecoEnabled = true;
+           // MainPlayer.GetComponent<VideoPlayer>().Stop();
+            
+        }
     }
 
     public void OnStateChanged(bool scanning)
@@ -64,7 +82,7 @@ public class CloudHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        MainPlayer = GameObject.Find("Player");
+        
 
         mCloudRecoBehaviour = GetComponent<CloudRecoBehaviour>();
         mCloudRecoBehaviour.RegisterOnInitializedEventHandler(OnInitialized);
@@ -75,21 +93,22 @@ public class CloudHandler : MonoBehaviour
     }
 
 
-    void OnGUI()
-    {
+    //void OnGUI()
+    //{
         // Display current 'scanning' status
-        GUI.Box(new Rect(100, 100, 200, 50), mIsScanning ? "Scanning" : "Not scanning");
+      //  GUI.Box(new Rect(100, 100, 200, 50), mIsScanning ? "Scanning" : "Not scanning");
         // Display metadata of latest detected cloud-target
-        GUI.Box(new Rect(100, 200, 200, 50), "Metadata: " + mTargetMetadata);
+        //GUI.Box(new Rect(100, 200, 200, 50), "Metadata: " + mTargetMetadata);
         // If not scanning, show button
         // so that user can restart cloud scanning
-        if (!mIsScanning)
-        {
-            if (GUI.Button(new Rect(100, 300, 200, 50), "Restart Scanning"))
-            {
+        //if (!mIsScanning)
+        //{
+        //    if (GUI.Button(new Rect(100, 300, 200, 50), "Restart Scanning"))
+        //    {
                 // Restart TargetFinder
-                mCloudRecoBehaviour.CloudRecoEnabled = true;
-            }
-        }
-    }
+              //  mCloudRecoBehaviour.CloudRecoEnabled = true;
+        //    }
+        //}
+    //}
 }
+
